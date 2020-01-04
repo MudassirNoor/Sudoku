@@ -22,5 +22,3 @@ def RandomlyRemoveNumbersFromBoard(gameBoard):
             gameBoard.UpdatePosition(row, column, 0)
 
     del copiedGameBoard
-
-

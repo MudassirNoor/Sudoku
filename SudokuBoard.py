@@ -5,15 +5,7 @@ class SudokuBoard:
     DIMENSION = 9
     SUBMATRIXDIMENSION = 3
     def __init__(self):
-        self.Grid = [[0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 8, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                     [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        self.Grid = [[0]*self.DIMENSION for i in range(self.DIMENSION)]
 
     def UpdatePosition(self, row, column, digit):
         self.Grid[row][column] = digit
