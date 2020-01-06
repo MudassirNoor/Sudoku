@@ -5,25 +5,28 @@ class SudokuBoard:
     DIMENSION = 9
     SUBMATRIXDIMENSION = 3
     def __init__(self):
-        self.Grid = [[0]*self.DIMENSION for i in range(self.DIMENSION)]
+        self._grid = [[0] * self.DIMENSION for i in range(self.DIMENSION)]
+
+    def GetPositionValue(self, row, column):
+        return self._grid[row][column]
 
     def UpdatePosition(self, row, column, digit):
-        self.Grid[row][column] = digit
+        self._grid[row][column] = digit
 
     def ValidRow(self, digit, row):
         for column in range(SudokuBoard.DIMENSION):
-            if self.Grid[row][column] == digit:
+            if self._grid[row][column] == digit:
                 return False
         return True
 
     def ValidColumn(self, digit, column):
         for row in range(SudokuBoard.DIMENSION):
-            if self.Grid[row][column] == digit:
+            if self._grid[row][column] == digit:
                 return False
         return True
 
     def ValidSubmatrix(self, digit, row, column):
-        subMatrix = Solver.CreateSubMatrix(self.Grid, row, column)
+        subMatrix = Solver.CreateSubMatrix(self._grid, row, column)
         for row in range(SudokuBoard.SUBMATRIXDIMENSION):
             for column in range(SudokuBoard.SUBMATRIXDIMENSION):
                 if subMatrix[row][column] == digit:

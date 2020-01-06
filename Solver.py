@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import random
-from SudokuBoard import SudokuBoard
+from SudokuBoard import *
 
 def printGrid(grid):
     for row in grid:
@@ -10,7 +10,7 @@ def printGrid(grid):
 
 def BackTrackSolver(sudokuBoard, generate=False):
     isSolved = False
-    assigned, row, column = UnassignedPosition(sudokuBoard.Grid)
+    assigned, row, column = UnassignedPosition(sudokuBoard._grid)
 
     if not assigned:
         return True
@@ -35,7 +35,6 @@ def BackTrackSolver(sudokuBoard, generate=False):
     return isSolved
 
 def CreateSubMatrix(grid, row, column):
-    # Convert current row and column into a position in 3x3 submatrix
     currentRowPosition = row % 3
     currentColumnPosition = column % 3
 

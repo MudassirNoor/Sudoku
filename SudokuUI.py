@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from tkinter import *
 import PuzzleGenerator
-import SudokuBoard
 
 difficulty = {"Easy" : 40, "Medium" : 70, "Hard" : 80}
 gameFrameDimension = 450
@@ -9,12 +8,8 @@ gridDimension = 50
 
 def CreateUI():
     root = Tk()
-    app = Sudoku(root)
-
+    Sudoku(root)
     root.mainloop()
-
-
-    return 0
 
 def makeGridTag(row, column):
     return 'G' + str(row) + str(column)
@@ -98,7 +93,8 @@ class GameWindow(Toplevel):
         quitGameButton = Button(self._optionsBar, text ="Quit Game", command= self.close)
         clear.grid(column = 4, row = 0)
         quitGameButton.grid(column = 2, row = 0)
-        #TODO: perhaps add a timer window
+        #TODO: add a timer window
+        #TODO: add hint option
 
     def drawGrid(self):
         yFinal = 0
@@ -146,7 +142,7 @@ class GameWindow(Toplevel):
     def select(self, event,object):
         object : GridInfo
         element = self._canvas.find_withtag(object.getGridTag())
-        self.deSelect(object.getGridTag())
+        self.unselect(object.getGridTag())
         if not object._selected:
             self._canvas.itemconfig(element, fill ='blue')
             object._selected = True
@@ -154,7 +150,7 @@ class GameWindow(Toplevel):
             self._canvas.itemconfig(element, fill ='white')
             object._selected = False
 
-    def deSelect(self, currentTag):
+    def unselect(self, currentTag):
         for gridInfo in self._gridInfos:
             if gridInfo._selected and gridInfo.getGridTag() != currentTag:
                 element = self._canvas.find_withtag(gridInfo.getGridTag())
