@@ -47,12 +47,12 @@ class Sudoku(object):
         newGameButton = Button(self._frame, text="New Game", command=self.openGameFrame)
         newGameButton.pack()
 
-        self.difficulty = StringVar(self._frame)
-        self.difficulty.set(list(difficulty.keys())[0])
+        self._difficulty = StringVar(self._frame)
+        self._difficulty.set(list(difficulty.keys())[0])
         self.createDifficultyMenu()
 
     def createDifficultyMenu(self):
-        options = OptionMenu(self._frame, self.difficulty, *tuple(list(difficulty.keys())))
+        options = OptionMenu(self._frame, self._difficulty, *tuple(list(difficulty.keys())))
         options.pack()
 
     def hide(self):
@@ -60,7 +60,11 @@ class Sudoku(object):
 
     def openGameFrame(self):
         self.hide()
-        subFrame = GameWindow(self)
+        subFrame = GameWindow(self, self.getDifficulty())
+
+    def getDifficulty(self):
+        selectedDifficulty = self._difficulty.get()
+        return difficulty.get(str(selectedDifficulty))
 
     def makeVisible(self):
         self._root.update()
@@ -68,13 +72,13 @@ class Sudoku(object):
 
 class GameWindow(Toplevel):
 
-    def __init__(self, original):
+    def __init__(self, original, difficulty):
         Toplevel.__init__(self)
         self._originalframe = original
         self._optionsBar = Frame(self, bd = 3)
         self._canvas = Canvas(self, height = gameFrameDimension, width = gameFrameDimension, bg ="white")
         self._canvas.grid(row = 0, column = 0, rowspan = 8, columnspan = 8)
-        self._board = PuzzleGenerator.GenerateRandomBoard()
+        self._board = PuzzleGenerator.GenerateRandomBoard(difficulty)
         self._gridInfos = []
 
         self.createWindow()
@@ -147,25 +151,26 @@ class GameWindow(Toplevel):
             self._canvas.itemconfig(element, fill ='blue')
             object._selected = True
         else:
-            self._canvas.itemconfig(element, fill ='white')
+            self._canvas.itemconfig(element, fill ='yellow')
             object._selected = False
 
     def unselect(self, currentTag):
         for gridInfo in self._gridInfos:
             if gridInfo._selected and gridInfo.getGridTag() != currentTag:
                 element = self._canvas.find_withtag(gridInfo.getGridTag())
-                self._canvas.itemconfig(element, fill='white')
+                self._canvas.itemconfig(element, fill='yellow')
                 gridInfo._selected = False
 
     def keyPress(self, event):
         grid = self.getSelectedGrid()
         grid : GridInfo
         try:
-            if event.char in "123456789":
+            if event.char in "123456789" and event.char != '':
                 element = self._canvas.find_withtag(grid.getTextTag())
                 self._canvas.delete(element)
                 self._canvas.create_text(grid._textPosition[0], grid._textPosition[1], text = event.char, tag = grid.getTextTag())
                 self._board.UpdatePosition(grid._gridPosition[0], grid._gridPosition[1], int(event.char))
+                #TODO: add check win entry
         except:
             pass
 
@@ -182,6 +187,10 @@ class GameWindow(Toplevel):
             element = self._canvas.find_withtag(gridInfo.getTextTag())
             self._canvas.delete(element)
             self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text= "_", tag=gridInfo.getTextTag())
+
+    def hint(self):
+        return 0
+
 
     def close(self):
         self.destroy()

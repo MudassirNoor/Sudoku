@@ -4,15 +4,15 @@ import random
 from SudokuBoard import SudokuBoard
 import Solver
 
-def GenerateRandomBoard():
+def GenerateRandomBoard(unfilledPositions):
     newGameBoard = SudokuBoard()
     Solver.BackTrackSolver(newGameBoard, True)
-    RandomlyRemoveNumbersFromBoard(newGameBoard)
+    RandomlyRemoveNumbersFromBoard(newGameBoard, unfilledPositions)
     return newGameBoard
 
-def RandomlyRemoveNumbersFromBoard(gameBoard):
+def RandomlyRemoveNumbersFromBoard(gameBoard, unfilledPositions):
     copiedGameBoard = copy.deepcopy(gameBoard)
-    for i in range(1, 30):
+    for i in range(1, unfilledPositions):
         row = random.randrange(0, SudokuBoard.DIMENSION)
         column = random.randrange(0, SudokuBoard.DIMENSION)
         copiedGameBoard.UpdatePosition(row, column, 0)
