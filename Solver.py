@@ -2,12 +2,6 @@
 import random
 from SudokuBoard import *
 
-def printGrid(grid):
-    for row in grid:
-        for column in row:
-            print(column, end = " ")
-        print()
-
 def BackTrackSolver(sudokuBoard, generate=False):
     isSolved = False
     existsUnassigned, row, column = UnassignedPosition(sudokuBoard._grid)
