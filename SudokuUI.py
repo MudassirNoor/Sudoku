@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from tkinter import *
 import PuzzleGenerator
+import Solver
 
 difficulty = {"Easy" : 40, "Medium" : 70, "Hard" : 80}
 gameFrameDimension = 450
@@ -29,7 +30,6 @@ class GridInfo:
         self._textPosition = textPosition
         self._rewritable = False
         self._selected = False
-        self._gridColor = 'white'
 
     def getGridTag(self):
         return makeGridTag(self._gridPosition[0], self._gridPosition[1])
@@ -103,9 +103,12 @@ class GameWindow(Toplevel):
         hintButton.bind('<ButtonPress-1>', self.hint)
         hintButton.bind('<ButtonRelease-1>', self.unHint)
 
-        clearButton.grid(column = 4, row = 0)
-        quitGameButton.grid(column = 2, row = 0)
-        hintButton.grid(column =3, row = 0)
+        solveButton = Button(self._optionsBar, text="Solve Yourself", command= self.solve)
+
+        solveButton.grid(column = 4, row = 0)
+        clearButton.grid(column = 3, row = 0)
+        quitGameButton.grid(column = 1, row = 0)
+        hintButton.grid(column =2, row = 0)
 
     def drawGrid(self):
         yFinal = 0
@@ -219,6 +222,18 @@ class GameWindow(Toplevel):
             if gridInfo._rewritable:
                 element = self._canvas.find_withtag(gridInfo.getGridTag())
                 self._canvas.itemconfig(element, fill='yellow')
+
+    def solve(self):
+        Solver.BackTrackSolver(self._board)
+        for gridInfo in self._gridInfos:
+            gridInfo : GridInfo
+            if gridInfo._rewritable:
+                value = self._board.getPositionValue(gridInfo._gridPosition[0], gridInfo._gridPosition[1])
+                element = self._canvas.find_withtag(gridInfo.getTextTag())
+                self._canvas.delete(element)
+                self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text= str(value),
+                                         tag=gridInfo.getTextTag(), fill = 'red')
+
 
     def close(self):
         self.destroy()
