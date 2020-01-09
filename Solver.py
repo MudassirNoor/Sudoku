@@ -10,9 +10,9 @@ def printGrid(grid):
 
 def BackTrackSolver(sudokuBoard, generate=False):
     isSolved = False
-    assigned, row, column = UnassignedPosition(sudokuBoard._grid)
+    existsUnassigned, row, column = UnassignedPosition(sudokuBoard._grid)
 
-    if not assigned:
+    if not existsUnassigned:
         return True
 
     for digit in range(1, 10):
@@ -33,37 +33,6 @@ def BackTrackSolver(sudokuBoard, generate=False):
             break
 
     return isSolved
-
-def CreateSubMatrix(grid, row, column):
-    currentRowPosition = row % 3
-    currentColumnPosition = column % 3
-
-    upperRowRange, lowerRowRange = Get3x3ConvertedPositions(currentRowPosition, row)
-    upperColumnRange, lowerColumnRange = Get3x3ConvertedPositions(currentColumnPosition, column)
-
-    subMatrix = []
-    subRow = 0
-    for r in range(lowerRowRange, upperRowRange):
-        subMatrix.append([])
-        for c in range(lowerColumnRange, upperColumnRange):
-            subMatrix[subRow].append(grid[r][c])
-        subRow += 1
-
-    return subMatrix
-
-def Get3x3ConvertedPositions(remainder, givenPosition):
-    upperBound = 1
-    if remainder == 2:
-        upperBound += givenPosition
-        lowerBound = givenPosition - 2
-    elif remainder == 0:
-        upperBound += givenPosition + 2
-        lowerBound = givenPosition
-    else:
-        upperBound += givenPosition + 1
-        lowerBound = givenPosition - 1
-
-    return upperBound, lowerBound
 
 def UnassignedPosition(grid):
     for row in range(SudokuBoard.DIMENSION):
