@@ -29,6 +29,7 @@ class GridInfo:
         self._textPosition = textPosition
         self._rewritable = False
         self._selected = False
+        self._gridColor = 'white'
 
     def getGridTag(self):
         return makeGridTag(self._gridPosition[0], self._gridPosition[1])
@@ -93,18 +94,24 @@ class GameWindow(Toplevel):
 
     def makeSideBar(self):
         self._optionsBar.grid(row = 8, column = 0, columnspan = 9)
-        clear = Button(self._optionsBar, text ="Clear", command = self.clearEntries)
+
+        clearButton = Button(self._optionsBar, text ="Clear", command = self.clearEntries)
+
         quitGameButton = Button(self._optionsBar, text ="Quit Game", command= self.close)
-        clear.grid(column = 4, row = 0)
+
+        hintButton = Button(self._optionsBar, text ='Hint')
+        hintButton.bind('<ButtonPress-1>', self.hint)
+        hintButton.bind('<ButtonRelease-1>', self.unHint)
+
+        clearButton.grid(column = 4, row = 0)
         quitGameButton.grid(column = 2, row = 0)
-        #TODO: add a timer window
-        #TODO: add hint option
+        hintButton.grid(column =3, row = 0)
 
     def drawGrid(self):
         yFinal = 0
         matrixRow = 0
         for yInitial in range(0, gameFrameDimension, gridDimension):
-            xFinal = 50
+            xFinal = gameFrameDimension / 9
             yFinal += gridDimension
             matrixColumn = 0
 
@@ -122,14 +129,14 @@ class GameWindow(Toplevel):
             matrixRow += 1
 
         for xInitial in (150, 300):
-            self._canvas.create_line(0, xInitial, gameFrameDimension, xInitial, fill ="red", width = 2)
-            self._canvas.create_line(xInitial, 0, xInitial, gameFrameDimension, fill ="red", width = 2)
+            self._canvas.create_line(0, xInitial, gameFrameDimension, xInitial, fill ="magenta", width = 3)
+            self._canvas.create_line(xInitial, 0, xInitial, gameFrameDimension, fill ="magenta", width = 3)
 
     def displayGameObject(self):
         for gridInfo in self._gridInfos:
             row = gridInfo._gridPosition[0]
             column = gridInfo._gridPosition[1]
-            value = self._board.GetPositionValue(row, column)
+            value = self._board.getPositionValue(row, column)
 
             if value != 0:
                 self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text = value)
@@ -164,15 +171,20 @@ class GameWindow(Toplevel):
     def keyPress(self, event):
         grid = self.getSelectedGrid()
         grid : GridInfo
-        try:
-            if event.char in "123456789" and event.char != '':
-                element = self._canvas.find_withtag(grid.getTextTag())
-                self._canvas.delete(element)
-                self._canvas.create_text(grid._textPosition[0], grid._textPosition[1], text = event.char, tag = grid.getTextTag())
-                self._board.UpdatePosition(grid._gridPosition[0], grid._gridPosition[1], int(event.char))
-                #TODO: add check win entry
-        except:
-            pass
+        if grid == None:
+            return
+        if event.keysym == 'BackSpace':
+            element = self._canvas.find_withtag(grid.getTextTag())
+            self._canvas.delete(element)
+            self._canvas.create_text(grid._textPosition[0], grid._textPosition[1], text = "_", tag = grid.getTextTag())
+            self._board.updatePosition(grid._gridPosition[0], grid._gridPosition[1], 0)
+
+        if event.char in "123456789" and event.char != '':
+            element = self._canvas.find_withtag(grid.getTextTag())
+            self._canvas.delete(element)
+            self._canvas.create_text(grid._textPosition[0], grid._textPosition[1], text = event.char, tag = grid.getTextTag())
+            self._board.updatePosition(grid._gridPosition[0], grid._gridPosition[1], int(event.char))
+            #TODO: add check win entry
 
     def getSelectedGrid(self):
         for gridInfo in self._gridInfos:
@@ -183,14 +195,30 @@ class GameWindow(Toplevel):
         for gridInfo in self._gridInfos:
             if not gridInfo._rewritable:
                 continue
-            self._board.UpdatePosition(gridInfo._gridPosition[0], gridInfo._gridPosition[1], 0)
+            self._board.updatePosition(gridInfo._gridPosition[0], gridInfo._gridPosition[1], 0)
             element = self._canvas.find_withtag(gridInfo.getTextTag())
             self._canvas.delete(element)
             self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text= "_", tag=gridInfo.getTextTag())
 
-    def hint(self):
-        return 0
+    def hint(self, event):
+        for gridInfo in self._gridInfos:
+            gridInfo : GridInfo
+            value = self._board.getPositionValue(gridInfo._gridPosition[0], gridInfo._gridPosition[1])
 
+            if gridInfo._rewritable and value != 0:
+                valid = self._board.validDigit(value, gridInfo._gridPosition[0], gridInfo._gridPosition[1])
+                element = self._canvas.find_withtag(gridInfo.getGridTag())
+                if not valid:
+                    self._canvas.itemconfig(element, fill='red')
+                else:
+                    self._canvas.itemconfig(element, fill='cyan')
+
+    def unHint(self, event):
+        for gridInfo in self._gridInfos:
+            gridInfo : GridInfo
+            if gridInfo._rewritable:
+                element = self._canvas.find_withtag(gridInfo.getGridTag())
+                self._canvas.itemconfig(element, fill='yellow')
 
     def close(self):
         self.destroy()
