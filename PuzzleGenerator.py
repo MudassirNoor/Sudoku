@@ -15,10 +15,10 @@ def RandomlyRemoveNumbersFromBoard(gameBoard, unfilledPositions):
     for i in range(1, unfilledPositions):
         row = random.randrange(0, SudokuBoard.DIMENSION)
         column = random.randrange(0, SudokuBoard.DIMENSION)
-        copiedGameBoard.UpdatePosition(row, column, 0)
+        copiedGameBoard.updatePosition(row, column, 0)
 
         solved = Solver.BackTrackSolver(copiedGameBoard)
         if solved:
-            gameBoard.UpdatePosition(row, column, 0)
+            gameBoard.updatePosition(row, column, 0)
 
     del copiedGameBoard

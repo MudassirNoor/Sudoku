@@ -21,14 +21,14 @@ def BackTrackSolver(sudokuBoard, generate=False):
         else:
             value = digit
 
-        if not sudokuBoard.ValidDigit(value, row, column):
+        if not sudokuBoard.validDigit(value, row, column):
             continue
 
-        sudokuBoard.UpdatePosition(row, column, value)
+        sudokuBoard.updatePosition(row, column, value)
         isSolved = BackTrackSolver(sudokuBoard, generate)
 
         if not isSolved:
-            sudokuBoard.UpdatePosition(row, column, 0)
+            sudokuBoard.updatePosition(row, column, 0)
         else:
             break
 
