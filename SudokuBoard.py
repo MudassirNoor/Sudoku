@@ -90,8 +90,8 @@ class SudokuBoard:
         if existsUnassigned:
             return False
 
-        for row in self.DIMENSION:
-            for column in self.DIMENSION:
+        for row in range(self.DIMENSION):
+            for column in range(self.DIMENSION):
                 valid = self.validDigit(self._grid[row][column], row, column)
                 if not valid:
                     return False
