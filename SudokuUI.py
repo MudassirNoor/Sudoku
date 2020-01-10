@@ -95,20 +95,20 @@ class GameWindow(Toplevel):
     def makeSideBar(self):
         self._optionsBar.grid(row = 8, column = 0, columnspan = 9)
 
-        clearButton = Button(self._optionsBar, text ="Clear", command = self.clearEntries)
+        self._clearButton = Button(self._optionsBar, text ="Clear", command = self.clearEntries)
 
-        quitGameButton = Button(self._optionsBar, text ="Quit Game", command= self.close)
+        self._quitGameButton = Button(self._optionsBar, text ="Quit Game", command= self.close)
 
-        hintButton = Button(self._optionsBar, text ='Hint')
-        hintButton.bind('<ButtonPress-1>', self.hint)
-        hintButton.bind('<ButtonRelease-1>', self.unHint)
+        self._hintButton = Button(self._optionsBar, text ='Hint')
+        self._hintButton.bind('<ButtonPress-1>', self.hint)
+        self._hintButton.bind('<ButtonRelease-1>', self.unHint)
 
-        solveButton = Button(self._optionsBar, text="Solve Yourself", command= self.solve)
+        self._solveButton = Button(self._optionsBar, text="Solve Yourself", command= self.solve)
 
-        solveButton.grid(column = 4, row = 0)
-        clearButton.grid(column = 3, row = 0)
-        quitGameButton.grid(column = 1, row = 0)
-        hintButton.grid(column =2, row = 0)
+        self._solveButton.grid(column = 4, row = 0)
+        self._clearButton.grid(column = 3, row = 0)
+        self._quitGameButton.grid(column = 1, row = 0)
+        self._hintButton.grid(column =2, row = 0)
 
     def drawGrid(self):
         yFinal = 0
@@ -146,7 +146,7 @@ class GameWindow(Toplevel):
             else:
                 gridInfo._rewritable = True
                 textTag = gridInfo.getTextTag()
-                self._canvas.itemconfig(gridInfo.getGridTag(), fill = 'yellow')
+                self._canvas.itemconfig(gridInfo.getGridTag(), fill = '#c5ff05')
 
                 self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text="_", tag = textTag)
                 selectionCall = lambda event, object = gridInfo: self.select(event, object)
@@ -158,17 +158,17 @@ class GameWindow(Toplevel):
         element = self._canvas.find_withtag(object.getGridTag())
         self.unselect(object.getGridTag())
         if not object._selected:
-            self._canvas.itemconfig(element, fill ='blue')
+            self._canvas.itemconfig(element, fill ='#0582ff')
             object._selected = True
         else:
-            self._canvas.itemconfig(element, fill ='yellow')
+            self._canvas.itemconfig(element, fill ='#c5ff05')
             object._selected = False
 
     def unselect(self, currentTag):
         for gridInfo in self._gridInfos:
             if gridInfo._selected and gridInfo.getGridTag() != currentTag:
                 element = self._canvas.find_withtag(gridInfo.getGridTag())
-                self._canvas.itemconfig(element, fill='yellow')
+                self._canvas.itemconfig(element, fill='#c5ff05')
                 gridInfo._selected = False
 
     def keyPress(self, event):
@@ -187,7 +187,7 @@ class GameWindow(Toplevel):
             self._canvas.delete(element)
             self._canvas.create_text(grid._textPosition[0], grid._textPosition[1], text = event.char, tag = grid.getTextTag())
             self._board.updatePosition(grid._gridPosition[0], grid._gridPosition[1], int(event.char))
-            #TODO: add check win entry
+            self.checkWin()
 
     def getSelectedGrid(self):
         for gridInfo in self._gridInfos:
@@ -221,7 +221,7 @@ class GameWindow(Toplevel):
             gridInfo : GridInfo
             if gridInfo._rewritable:
                 element = self._canvas.find_withtag(gridInfo.getGridTag())
-                self._canvas.itemconfig(element, fill='yellow')
+                self._canvas.itemconfig(element, fill='#c5ff05')
 
     def solve(self):
         self.clearEntries()
@@ -233,8 +233,23 @@ class GameWindow(Toplevel):
                 element = self._canvas.find_withtag(gridInfo.getTextTag())
                 self._canvas.delete(element)
                 self._canvas.create_text(gridInfo._textPosition[0], gridInfo._textPosition[1], text= str(value),
-                                         tag=gridInfo.getTextTag(), fill = 'red')
+                                         tag=gridInfo.getTextTag(), fill = '#f7007c', font = "Times 10 bold")
+        self.disableCanvasAndButtons()
 
+    def checkWin(self):
+        if self._board.checkFinishedBoard():
+            x0,y0 = 2*gridDimension, 2*gridDimension
+            x1,y1 = 450 - (2*gridDimension), 450 - (2*gridDimension)
+            self._canvas.create_oval(x0, y0, x1, y1, fill = "cyan", outline = "cyan")
+            self._canvas.create_text(gameFrameDimension /2, gameFrameDimension /2, text = "Puzzle Solved!",
+                                     anchor = CENTER, fill = "#5087d4", font = "Times 15 italic bold")
+            self.disableCanvasAndButtons()
+
+    def disableCanvasAndButtons(self):
+        self._canvas.config(state="disabled")
+        self._clearButton.config(state="disabled")
+        self._solveButton.config(state="disabled")
+        self._hintButton.config(state="disabled")
 
     def close(self):
         self.destroy()
