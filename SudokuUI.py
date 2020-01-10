@@ -224,6 +224,7 @@ class GameWindow(Toplevel):
                 self._canvas.itemconfig(element, fill='yellow')
 
     def solve(self):
+        self.clearEntries()
         Solver.BackTrackSolver(self._board)
         for gridInfo in self._gridInfos:
             gridInfo : GridInfo
